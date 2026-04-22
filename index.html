@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Number Cleaner — by Nirob</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080b0f;
+  --surface: #0e1318;
+  --surface2: #131a22;
+  --border: #1e2a35;
+  --border2: #243040;
+  --cyan: #00d4ff;
+  --cyan2: #0099cc;
+  --cg: #00d4ff22;
+  --cg2: #00d4ff44;
+  --tg: #29b6f6;
+  --text: #dce8f0;
+  --text2: #6a8a9a;
+  --text3: #3a5060;
+  --red: #ff4d4d;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  padding: 20px 12px 40px;
+  background-image: radial-gradient(ellipse 70% 35% at 50% -5%, #00d4ff0b 0%, transparent 65%);
+}
+.container { max-width: 680px; margin: 0 auto; width: 100%; }
+
+/* Header */
+.header { text-align:center; margin-bottom:25px; }
+.header-icon { font-size:2rem; display:block; margin-bottom:8px; filter:drop-shadow(0 0 16px #00d4ff88); }
+.header h1 {
+  font-family:'JetBrains Mono',monospace;
+  font-size:1.25rem; font-weight:700;
+  color:var(--cyan); letter-spacing:2px; text-transform:uppercase;
+}
+
+/* Nav */
+.nav-tabs {
+  display:flex; gap:5px; margin-bottom:20px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:5px;
+}
+.nav-tab {
+  flex:1; padding:12px 8px; text-align:center;
+  border:none; border-radius:8px; background:transparent;
+  color:var(--text3); font-size:0.85rem; font-weight:600; cursor:pointer; transition:0.25s;
+}
+.nav-tab.active { background:var(--cyan); color:#000; box-shadow:0 0 15px var(--cg2); }
+
+.page { display:none; animation: fadeIn 0.3s ease-in; }
+.page.active { display:block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Card */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:18px; margin-bottom:12px;
+}
+.field-label {
+  display:flex; align-items:center; gap:7px;
+  font-size:0.65rem; font-family:'JetBrains Mono',monospace;
+  color:var(--text3); text-transform:uppercase; letter-spacing:1px;
+  margin-bottom:10px; font-weight:500;
+}
+.dot { width:5px; height:5px; border-radius:50%; background:var(--cyan); box-shadow:0 0 7px var(--cyan); }
+
+textarea, input[type="text"], input[type="number"] {
+  width:100%; background:var(--bg); border:1px solid var(--border);
+  border-radius:9px; color:var(--text);
+  font-family:'JetBrains Mono',monospace; font-size:0.9rem;
+  padding:12px 14px; outline:none; transition:0.2s;
+}
+textarea:focus, input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px var(--cg); }
+
+.row { display:flex; gap:10px; align-items:flex-end; }
+.input-group { flex:1; }
+
+/* Buttons */
+.btn {
+  padding:12px 20px; border:none; border-radius:9px; cursor:pointer;
+  font-family:'Space Grotesk',sans-serif; font-size:0.85rem; font-weight:700;
+  transition:all 0.2s; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary { background:var(--cyan); color:#000; flex-shrink: 0; }
+.btn-ghost { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
+.btn-reset { background: rgba(255, 77, 77, 0.1); color: var(--red); border: 1px solid rgba(255, 77, 77, 0.2); font-size: 0.7rem; padding: 6px 10px; }
+
+/* Stats Row */
+.stats-row { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:12px; }
+.stat { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 5px; text-align:center; }
+.stat-num { font-family:'JetBrains Mono',monospace; font-size:1.2rem; font-weight:700; color:var(--cyan); }
+.stat-label { font-size:0.6rem; color:var(--text3); text-transform:uppercase; margin-top:4px; }
+
+/* Split Container */
+.split-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+.split-box { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 10px; text-align:center; }
+
+/* ═════════ MOBILE OPTIMIZATION ═════════ */
+@media (max-width: 500px) {
+  body { padding: 15px 10px 30px; }
+  .row { flex-direction: column; align-items: stretch; }
+  .btn { width: 100%; padding: 14px; }
+  .btn-reset { width: auto; }
+  .split-container { grid-template-columns: 1fr; }
+  .dev-hero { padding: 30px 15px 20px; }
+  .dev-name { font-size: 1.2rem; }
+  .info-grid { grid-template-columns: 1fr; }
+}
+
+/* ═════════ DEVELOPER PAGE ═════════ */
+.dev-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden; position:relative; }
+.dev-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--cyan),#0077ff,var(--cyan),transparent); background-size:300%; animation:glide 3s linear infinite; }
+@keyframes glide { 0%{background-position:0%} 100%{background-position:300%} }
+.dev-hero { background:linear-gradient(180deg,#00d4ff09 0%,transparent 100%); padding:40px 20px 25px; text-align:center; }
+.avatar-ring { width:90px; height:90px; border-radius:50%; margin:0 auto 15px; position:relative; display:flex; align-items:center; justify-content:center; }
+.avatar-ring::before { content:''; position:absolute; inset:-3px; border-radius:50%; background:conic-gradient(var(--cyan),#0077ff,#00e5ff,var(--cyan)); animation:spin 4s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.avatar-ring::after { content:''; position:absolute; inset:2px; border-radius:50%; background:var(--surface); }
+.avatar-emoji { font-size:2.5rem; position:relative; z-index:2; }
+.dev-name { font-family:'JetBrains Mono',monospace; font-size:1.3rem; font-weight:700; color:var(--cyan); margin-bottom:5px; }
+.info-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin: 20px 0; }
+.info-item { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px; }
+.info-key { font-size:0.6rem; color:var(--text3); text-transform:uppercase; margin-bottom:4px; }
+.info-val { font-size:0.85rem; color:var(--text); font-weight:600; }
+.tg-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px; background:linear-gradient(135deg,#1565c022,#29b6f622); border:1px solid #29b6f644; border-radius:12px; color:var(--tg); text-decoration:none; font-weight:700; font-size:0.9rem; }
+
+/* Toast */
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); background:#0e1318; border:1px solid var(--border2); color:var(--text); padding:12px 20px; border-radius:12px; opacity:0; pointer-events:none; transition:0.3s; z-index:9999; width: max-content; max-width: 90%; font-size: 0.85rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.badge { background:var(--cg); color:var(--cyan); border:1px solid var(--cg2); border-radius:20px; padding:2px 8px; font-size:0.7rem; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <span class="header-icon">📱</span>
+    <h1>Number Cleaner</h1>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-tool" onclick="switchTab('tool')">🛠 Tool</button>
+    <button class="nav-tab" id="tab-dev" onclick="switchTab('dev')">😎 Developer</button>
+  </div>
+
+  <div id="page-tool" class="page active">
+    
+    <div class="card">
+      <div class="field-label" style="justify-content: space-between;">
+        <span><span class="dot"></span>Paste Number List</span>
+        <button class="btn btn-reset" onclick="fullReset()">↺ Reset</button>
+      </div>
+      <textarea id="inputArea" rows="6" placeholder="Paste Number List..."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="input-group">
+          <div class="field-label"><span class="dot"></span>Country Code</div>
+          <input type="text" id="countryCode" placeholder="e.g. 255">
+        </div>
+        <button class="btn btn-primary" onclick="processNumbers()">▶ Run Cleaner</button>
+      </div>
+    </div>
+
+    <div class="stats-row" id="statsRow" style="display:none">
+      <div class="stat"><div class="stat-num" id="statFound">0</div><div class="stat-label">Found</div></div>
+      <div class="stat"><div class="stat-num" id="statCleaned">0</div><div class="stat-label">Clean</div></div>
+      <div class="stat"><div class="stat-num" id="statDup">0</div><div class="stat-label">Dups</div></div>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><span class="dot"></span>Search Prefix</div>
+      <div class="row">
+        <div class="input-group">
+          <input type="text" id="serialFinder" placeholder="e.g. 674">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-ghost" style="flex: 1;" onclick="findSerial()">🔍 Search</button>
+          <button class="btn btn-ghost" onclick="resetSerial()">↺</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><span class="dot"></span>Copy & Split Tools</div>
+      <div class="row" style="margin-bottom:10px">
+        <input type="number" id="copyAmount" placeholder="Amount to copy" style="flex: 1;">
+        <button class="btn btn-ghost" onclick="copyCustom()">📋 Custom Copy</button>
+      </div>
+      <div class="row">
+        <input type="number" id="splitSize" placeholder="Parts (e.g. 2)" style="flex: 1;">
+        <button class="btn btn-ghost" onclick="splitNumbers()">➗ Split List</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="output-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap: 10px;">
+        <div class="field-label" style="margin:0"><span class="dot"></span>Output <span class="badge" id="countBadge">0</span></div>
+        <div style="display:flex; gap:5px;">
+          <button class="btn btn-ghost btn-sm" onclick="downloadOutput()">💾 Save</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyAll()">📋 All</button>
+        </div>
+      </div>
+      <textarea id="outputArea" rows="8" placeholder="Output here..." readonly></textarea>
+      <div id="splitResults" class="split-container"></div>
+    </div>
+  </div>
+
+  <div id="page-dev" class="page">
+    <div class="dev-card">
+      <div class="dev-hero">
+        <div class="avatar-ring"><div class="avatar-emoji">😎</div></div>
+        <div class="dev-name">Nirob Islam</div>
+        <div style="font-size: 0.75rem; color: var(--text3);">Full Stack Developer</div>
+      </div>
+
+      <div style="padding: 0 20px 25px;">
+        <div class="info-grid">
+          <div class="info-item"><div class="info-key">🏙 City</div><div class="info-val">Dhaka</div></div>
+          <div class="info-item"><div class="info-key">🎂 Birthday</div><div class="info-val">20 October</div></div>
+          <div class="info-item"><div class="info-key">😐 Status</div><div class="info-val">Single</div></div>
+          <div class="info-item"><div class="info-key">❤️‍🔥 Religion</div><div class="info-val">Islam</div></div>
+        </div>
+
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:15px; margin-bottom:20px; font-size:0.85rem; color:var(--text2); line-height:1.6;">
+          🙂 &nbsp;I am a very ordinary person.<br>
+          🤍 &nbsp;Thanks for using my tool.
+        </div>
+
+        <a class="tg-btn" href="https://t.me/Nirob_Islam1100" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#29b6f6"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.48 14.697l-2.95-.924c-.64-.204-.654-.64.136-.953l11.52-4.44c.533-.194 1.001.13.376.868z"/></svg>
+          Contact Developer
+        </a>
+      </div>
+
+      <div style="padding:12px 20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:0.65rem; color:var(--text3);">
+        <span>Built with ❤️ by Nirob</span>
+        <span class="badge">v 2.0</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allNumbers = [];
+
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function processNumbers() {
+  const input = document.getElementById('inputArea').value.trim();
+  const cc = document.getElementById('countryCode').value.trim();
+  if (!input) return showToast('❌ Paste numbers first');
+  if (!cc) return showToast('❌ Enter Country Code');
+
+  const raw = input.match(/\d{7,15}/g) || [];
+  const cleaned = raw.map(n => n.startsWith(cc) ? n.slice(cc.length) : n);
+  
+  allNumbers = [...new Set(cleaned)].sort();
+  document.getElementById('statFound').textContent = raw.length;
+  document.getElementById('statCleaned').textContent = allNumbers.length;
+  document.getElementById('statDup').textContent = raw.length - allNumbers.length;
+  document.getElementById('statsRow').style.display = 'grid';
+  document.getElementById('countBadge').textContent = allNumbers.length;
+  document.getElementById('outputArea').value = allNumbers.join('\n');
+  document.getElementById('splitResults').innerHTML = '';
+  showToast('✅ Processed Successfully!');
+}
+
+function findSerial() {
+  const prefix = document.getElementById('serialFinder').value.trim();
+  if (!prefix || allNumbers.length === 0) return showToast('❌ No data');
+  const filtered = allNumbers.filter(n => n.startsWith(prefix));
+  document.getElementById('outputArea').value = filtered.join('\n');
+  document.getElementById('countBadge').textContent = filtered.length;
+  showToast(`🔍 Found ${filtered.length}`);
+}
+
+function resetSerial() {
+  document.getElementById('serialFinder').value = '';
+  document.getElementById('outputArea').value = allNumbers.join('\n');
+  document.getElementById('countBadge').textContent = allNumbers.length;
+  showToast('↺ Restored');
+}
+
+function copyAll() {
+  const text = document.getElementById('outputArea').value;
+  if (!text) return showToast('❌ No data');
+  navigator.clipboard.writeText(text);
+  showToast('📋 All Copied!');
+}
+
+function copyCustom() {
+  const amount = parseInt(document.getElementById('copyAmount').value);
+  const currentOutput = document.getElementById('outputArea').value.split('\n').filter(Boolean);
+  if (!amount || currentOutput.length === 0) return showToast('❌ Invalid amount');
+  const toCopy = currentOutput.slice(0, amount).join('\n');
+  navigator.clipboard.writeText(toCopy);
+  showToast(`📋 Copied ${amount} numbers!`);
+}
+
+function splitNumbers() {
+  const totalParts = parseInt(document.getElementById('splitSize').value);
+  const container = document.getElementById('splitResults');
+  const currentOutput = document.getElementById('outputArea').value.split('\n').filter(Boolean);
+  container.innerHTML = '';
+  if (!totalParts || totalParts <= 0 || currentOutput.length === 0) return showToast('❌ Error Splitting');
+
+  const size = Math.ceil(currentOutput.length / totalParts);
+  for (let i = 0; i < totalParts; i++) {
+    const group = currentOutput.slice(i * size, (i + 1) * size);
+    if (group.length === 0) break;
+    const box = document.createElement('div');
+    box.className = 'split-box';
+    box.innerHTML = `<div style="font-size:0.6rem; color:var(--text3); margin-bottom:5px;">PART ${i+1} (${group.length})</div>
+                     <button class="btn btn-ghost btn-sm" style="width:100%; font-size:0.7rem;" onclick="copySpecific('${group.join('\\n')}')">📋 Copy</button>`;
+    container.appendChild(box);
+  }
+  showToast('➗ List Split!');
+}
+
+function copySpecific(text) {
+  navigator.clipboard.writeText(text.replace(/\\n/g, '\n'));
+  showToast('📋 Part Copied!');
+}
+
+function fullReset() {
+  document.getElementById('inputArea').value = '';
+  document.getElementById('outputArea').value = '';
+  document.getElementById('countryCode').value = '';
+  document.getElementById('statsRow').style.display = 'none';
+  document.getElementById('splitResults').innerHTML = '';
+  document.getElementById('countBadge').textContent = '0';
+  allNumbers = [];
+  showToast('↺ Reset Done');
+}
+
+function downloadOutput() {
+  const text = document.getElementById('outputArea').value;
+  if (!text) return showToast('❌ No data');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cleaned_numbers.txt';
+  a.click();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
